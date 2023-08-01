@@ -1,28 +1,28 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 const UserContext = createContext();
 
 export const useUserContext = () => useContext(UserContext);
 
 export default function UserProvider({ children }) {
-  const [user, setUser] = useState({
+  // Load user data from localStorage if available, otherwise use default values
+  const initialUserData = JSON.parse(localStorage.getItem('currentUser')) || {
     firstName: '',
     lastName: '',
     // You can include other user-related information here.
-  });
-
-  console.log('User data in context:', user);
-
-  // Create a new function to handle updating the user context
-  const updateUser = (userData) => {
-    setUser((prevUser) => ({
-      ...prevUser,
-      ...userData,
-    }));
   };
 
+  const [user, setUser] = useState(initialUserData);
+
+  useEffect(() => {
+    // Save user data to localStorage whenever it changes
+    localStorage.setItem('currentUser', JSON.stringify(user));
+  }, [user]);
+
+  console.log('User data in UserContext.js:', user);
+
   return (
-    <UserContext.Provider value={{ user, setUser: updateUser }}>
+    <UserContext.Provider value={{ user, setUser }}>
       {children}
     </UserContext.Provider>
   );

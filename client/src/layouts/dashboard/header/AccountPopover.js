@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react';
 // @mui
 import { alpha } from '@mui/material/styles';
 import { Box, Divider, Typography, Stack, MenuItem, Avatar, IconButton, Popover } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 // mocks_
-import account from '../../../_mock/account';
+import account from '../../../data/account';
+
 
 // ----------------------------------------------------------------------
 
@@ -11,35 +13,25 @@ const MENU_OPTIONS = [
   {
     label: 'Home',
     icon: 'eva:home-fill',
+    path: '/'
   },
   {
     label: 'Profile',
     icon: 'eva:person-fill',
+    path: '/profile'
   },
   {
     label: 'Settings',
     icon: 'eva:settings-2-fill',
+    path: 'settings'
   },
 ];
 
 // ----------------------------------------------------------------------
 
 export default function AccountPopover() {
+  const navigate = useNavigate();
   const [open, setOpen] = useState(null);
-  // const [currentUser, setCurrentUser] = useState(null);
-
-  // useEffect(() => {
-  //   const authToken = localStorage.getItem('authToken');
-  //   if (authToken) {
-  //     try {
-  //       // Decode the JWT token to get the user information
-  //       const decodedToken = jwt.decode(authToken);
-  //       setCurrentUser(decodedToken);
-  //     } catch (error) {
-  //       console.error('Error decoding JWT token:', error);
-  //     }
-  //   }
-  // }, []);
 
   const handleOpen = (event) => {
     setOpen(event.currentTarget);
@@ -53,6 +45,11 @@ export default function AccountPopover() {
     localStorage.removeItem('authToken');
     window.location.replace('/login');
   }
+
+  const handleMenuItemClick = (path) => {
+    navigate(path);
+    handleClose(); 
+  };
 
   return (
     <>
@@ -108,7 +105,7 @@ export default function AccountPopover() {
 
         <Stack sx={{ p: 1 }}>
           {MENU_OPTIONS.map((option) => (
-            <MenuItem key={option.label} onClick={handleClose}>
+            <MenuItem key={option.label} onClick={() => handleMenuItemClick(option.path)}>
               {option.label}
             </MenuItem>
           ))}

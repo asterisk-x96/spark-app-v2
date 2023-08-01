@@ -1,5 +1,4 @@
 import { useNavigate } from 'react-router-dom';
-
 import { Helmet } from 'react-helmet-async';
 import { faker } from '@faker-js/faker';
 // @mui
@@ -20,9 +19,13 @@ import {
   AppConversionRates,
 } from '../sections/@dashboard/app';
 
+import { useUserContext } from '../UserContext';
+
 // ----------------------------------------------------------------------
 
 export default function DashboardAppPage() {
+  
+  const { user } = useUserContext();
   const theme = useTheme();
   const navigate = useNavigate();
   const handleClick = () => {
@@ -39,7 +42,7 @@ export default function DashboardAppPage() {
 
       <Container maxWidth="xl">
         <Typography variant="h4" sx={{ mb: 5 }}>
-          Hi, Welcome back
+          Welcome back, {user.firstName}!
         </Typography>
 
         <Grid container spacing={3}>

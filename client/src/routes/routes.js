@@ -13,6 +13,8 @@ import NewGoalPage from '../pages/NewGoalPage';
 import RegisterPage from '../pages/RegisterPage';
 import WelcomePage from '../pages/WelcomePage';
 import TestData from '../pages/TestData';
+import ProfilePage from '../pages/ProfilePage';
+import ChatPage from '../pages/ChatPage'
 // ----------------------------------------------------------------------
 
 export default function Router() {
@@ -27,7 +29,9 @@ export default function Router() {
         { path: 'goals', element: <ProductsPage /> },
         { path: 'blog', element: <BlogPage /> },
         { path: 'create', element: <NewGoalPage />},
-        { path: 'welcome', element: <WelcomePage />}
+        { path: 'welcome', element: <WelcomePage />},
+        { path: 'profile', element: <ProfilePage />},
+        { path: 'chat', element: <ChatPage />}
       ],
     },
     {

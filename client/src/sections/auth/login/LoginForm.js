@@ -5,23 +5,25 @@
   import { LoadingButton } from '@mui/lab';
   // components
   import Iconify from '../../../components/iconify';
-  
+
+  // implement the same set firstName and lastName for user as in RegisterDetails.js
+  import { useUserContext } from '../../../UserContext';
 
 
   // ----------------------------------------------------------------------
 
   export default function LoginForm() {
     const navigate = useNavigate();
+    const { setUser } = useUserContext();
+
     const [showPassword, setShowPassword] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
     const handleSubmit = async (event) => {
-    //  navigate('/dashboard', { replace: true });
       event.preventDefault();
       
       try {
-
         const userData = {
           email,
           password,
@@ -42,6 +44,24 @@
 
         const loginData = await response.json();
         const authToken = loginData.token;
+        
+
+        // Get user data from database based on email
+        const userDataResponse = await fetch(`http://localhost:5000/api/user-data/${email}`);
+
+        if (!userDataResponse.ok) {
+          throw new Error('Error fetching user data');
+        }
+
+  
+        const userDataJson = await userDataResponse.json();
+
+        console.log(userDataJson);
+  
+        setUser({
+          firstName: userDataJson.firstName,
+          lastName: userDataJson.lastName,
+        });
 
         localStorage.setItem('authToken', authToken);
 

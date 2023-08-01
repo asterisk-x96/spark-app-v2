@@ -55,13 +55,39 @@ app.post('/api/user', async (req, res) => {
     const newUser = new User(user);
     await newUser.save();
 
-    console.log('Sample data saved to MongoDB');
+    console.log('User data saved to MongoDB');
 
     // Send a response to the front-end
-    res.json({ firstName: user.first_name, lastName: user.last_name });
+    res.json({ 
+      firstName: user.first_name, 
+      lastName: user.last_name 
+    });
+
   } catch (error) {
-    console.error('Error saving sample data to MongoDB:', error);
-    res.status(500).json({ error: 'An error occurred while saving the data.' });
+    console.error('Error saving user data to MongoDB:', error);
+    res.status(500).json({ error: 'An error occurred while saving the user.' });
+  }
+});
+
+// API route to check if the email already exists in the database
+app.get('/api/user/check-email/:email', async (req, res) => {
+  const { email } = req.params;
+
+  console.log(email);
+
+  try {
+    const existingUser = await User.findOne({ email });
+
+    // If a user with the given email exists, return a response indicating it exists
+    if (existingUser) {
+      return res.json({ exists: true });
+    }
+
+    // If the email does not exist, return a response indicating it doesn't exist
+    res.json({ exists: false });
+  } catch (error) {
+    console.error('Error checking email:', error);
+    res.status(500).json({ error: 'An error occurred while checking the email.' });
   }
 });
 
@@ -96,6 +122,48 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
+// API route to get user's data like first name, last name etc. based on email on login
+app.get('/api/user-data/:email', async (req, res) => {
+  const { email } = req.params;
+
+  try {
+    // Fetch the user data based on the provided email
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Respond with the user data
+    res.status(200).json({
+      firstName: user.first_name,
+      lastName: user.last_name,
+      // Include other user-related information here if available
+    });
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// Route to search for users based on the query parameter
+app.get('/api/users', async (req, res) => {
+  const searchQuery = req.query.search;
+
+  if (!searchQuery) {
+    return res.status(400).json({ error: 'Search query parameter is required.' });
+  }
+
+  try {
+    // Perform the Mongoose query to find users with names matching the search query
+    const filteredUsers = await User.find({ name: { $regex: new RegExp(searchQuery, 'i') } });
+
+    res.json(filteredUsers);
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    res.status(500).json({ error: 'Internal server error.' });
+  }
+});
 
 // Start the server
 app.listen(PORT, () => {

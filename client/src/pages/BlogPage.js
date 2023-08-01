@@ -5,7 +5,7 @@ import { Grid, Button, Container, Stack, Typography } from '@mui/material';
 import Iconify from '../components/iconify';
 import { BlogPostCard, BlogPostsSort, BlogPostsSearch } from '../sections/@dashboard/blog';
 // mock
-import POSTS from '../_mock/blog';
+import POSTS from '../data/blog';
 
 // ----------------------------------------------------------------------
 

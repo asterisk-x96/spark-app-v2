@@ -1,10 +1,9 @@
 import { useUserContext } from '../UserContext';
 
 export default function WelcomeScreen() {
-  const { user } = useUserContext();
 
-  console.log(user.firstName);
-  console.log(user.lastName);
+  
+  const { user } = useUserContext();
 
   return (
     <div>
