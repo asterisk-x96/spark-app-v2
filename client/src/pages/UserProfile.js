@@ -14,8 +14,7 @@ export default function UserProfile() {
 
   useEffect(() => {
     // Fetch user profile data using 'username' from the API and set it to 'userProfile' state
-    const cacheBuster = Math.random().toString(36).substring(7); // Generate a random string
-    fetch(`http://localhost:5000/api/user-profile/${username}?cb=${cacheBuster}`)
+    fetch(`http://localhost:5000/api/user-profile/${username}`)
       .then((response) => response.json())
       .then((data) => {
         console.log('Response data:', data);
@@ -30,7 +29,7 @@ export default function UserProfile() {
         setUserFriends(data.friends);
       })
       .catch((error) => console.error('Error fetching user friends:', error));
-  }, [username, user.id]); // Make sure to include user._id as a dependency
+  }, [username, user.id]); 
 
   const handleAddFriend = async () => {
     // Check if the user id from userProfile is not already in the friends list of the logged-in user

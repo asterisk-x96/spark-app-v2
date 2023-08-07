@@ -26,7 +26,7 @@ export default function ChatPage() {
 
   return (
     <Stack direction="column" spacing={3} sx={{ p: 4, height: '100vh' }}>
-      <Typography variant="h4">Chat Page</Typography>
+      <Typography variant="h4">Chatty Chat</Typography>
       <Paper sx={{ p: 2, height: '60vh', overflowY: 'scroll', display: 'flex', flexDirection: 'column' }}>
         {messages.map((msg) => (
           <Message key={msg.id} text={msg.text} sender={msg.sender} />

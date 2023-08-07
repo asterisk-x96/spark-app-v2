@@ -38,11 +38,8 @@ import { useUserContext } from '../UserContext'; // Import the useUserContext ho
 
 const TABLE_HEAD = [
   { id: 'name', label: 'Name', alignRight: false },
-  { id: 'company', label: 'Company', alignRight: false },
-  { id: 'role', label: 'Role', alignRight: false },
-  { id: 'isVerified', label: 'Verified', alignRight: false },
-  { id: 'status', label: 'Status', alignRight: false },
-  { id: '' },
+  { id: 'username', label: 'Username', alignRight: false },
+  { id: ''}
 ];
 
 // ----------------------------------------------------------------------
@@ -85,7 +82,7 @@ export default function FriendsPage() {
   const [filterName, setFilterName] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [userFriends, setUserFriends] = useState([]);
-  const [friendDetails, setFriendDetails] = useState({});
+  const [friendDetails, setFriendDetails] = useState([]);
   const { user } = useUserContext();
 
   useEffect(() => {
@@ -130,9 +127,6 @@ export default function FriendsPage() {
 
   console.log('User"s friends:', userFriends);
   console.log('Friends with details: ', friendDetails);
-  console.log('Friends with details:', friendDetails);
-
-  console.log('Number of friend:', userFriends.length);
 
   const handleOpenMenu = (event) => {
     setOpen(event.currentTarget);
@@ -188,9 +182,11 @@ export default function FriendsPage() {
 
   const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - userFriends.length) : 0;
 
-  const filteredUsers = applySortFilter(userFriends, getComparator(order, orderBy), filterName);
+  const filteredUsers = applySortFilter(friendDetails, getComparator(order, orderBy), filterName);
 
   const isNotFound = !filteredUsers.length && !!filterName;
+
+  console.log('Filtered users: ', filteredUsers)
 
   return (
     <>
@@ -201,20 +197,60 @@ export default function FriendsPage() {
         <UserListToolbar numSelected={selected.length} filterName={filterName} onFilterName={handleFilterByName} />
 
         <Scrollbar>
-            <TableContainer sx={{ minWidth: 800 }}>
-                <Table>
-                    <UserListHead
-                        order={order}
-                        orderBy={orderBy}
-                        headLabel={TABLE_HEAD}
-                        rowCount={friendDetails.length}
-                        numSelected={selected.length}
-                        onRequestSort={handleRequestSort}
-                        onSelectAllClick={handleSelectAllClick}
-                    />
-                </Table>
-              </TableContainer>
-          </Scrollbar>
+          <TableContainer sx={{ minWidth: 800 }}>
+            <Table>
+              <UserListHead
+                  order={order}
+                  orderBy={orderBy}
+                  headLabel={TABLE_HEAD}
+                  rowCount={friendDetails.length}
+                  numSelected={selected.length}
+                  onRequestSort={handleRequestSort}
+                  onSelectAllClick={handleSelectAllClick}
+              />
+
+              <TableBody>
+                {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
+                  const { id, firstName, lastName, username, avatar } = row;
+                  const selectedUser = selected.indexOf(username) !== -1;
+
+                  return (
+                    <TableRow key={id} hover tabIndex={-1} role="checkbox" selected={selectedUser}>
+                      <TableCell padding="checkbox">
+                        <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, username)} />
+                      </TableCell>
+                      <TableCell>
+                        <Stack direction="row" alignItems="center" spacing={2}>
+                          <Avatar alt={`${firstName} ${lastName}`} src={avatar} />
+                          <Typography variant="subtitle2">{`${firstName} ${lastName}`}</Typography>
+                        </Stack>
+                      </TableCell>
+
+                      <TableCell>{username}</TableCell>
+
+                      <TableCell align="right">
+                        <IconButton size="large" color="inherit" onClick={handleOpenMenu}>
+                            <Iconify icon={'eva:more-vertical-fill'} />
+                        </IconButton>
+                      </TableCell>
+
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Scrollbar>
+
+        <TablePagination
+          rowsPerPageOptions={[5, 10, 25]}
+          component="div"
+          count={userFriends.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+      />
       </Card>
 
       <Popover

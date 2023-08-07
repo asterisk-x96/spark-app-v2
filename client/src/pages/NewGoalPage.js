@@ -7,7 +7,7 @@ import { Container} from '@mui/material';
 import useResponsive from '../hooks/useResponsive';
 
 // sections
-import { GoalTitle, GoalDetails, GoalUser, GoalCreated } from '../sections/@dashboard/goals';
+import { GoalTitle, GoalDetails, GoalCreated, GoalUser } from '../sections/@dashboard/goals';
 
 // ----------------------------------------------------------------------
 
