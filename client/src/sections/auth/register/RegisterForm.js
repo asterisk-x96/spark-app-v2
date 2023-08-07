@@ -40,7 +40,7 @@ export default function RegisterForm({ onShowRegisterDetails }) {
 
       <Typography variant="body2" sx={{ mb: 5 }}>
         Already have an account? {''}
-        <Link variant="subtitle2">Log In</Link>
+        <Link href="/login" variant="subtitle2">Log In</Link>
       </Typography>
 
       <Stack direction="row" spacing={2}>

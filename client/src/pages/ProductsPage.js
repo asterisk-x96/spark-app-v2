@@ -43,7 +43,6 @@ export default function ProductsPage() {
         </Stack>
 
         <ProductList products={PRODUCTS} />
-        <ProductCartWidget />
       </Container>
     </>
   );

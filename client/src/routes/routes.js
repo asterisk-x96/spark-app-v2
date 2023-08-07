@@ -1,10 +1,10 @@
-import { Navigate, useRoutes } from 'react-router-dom';
-// layouts
+import React from 'react';
+import { Routes, Route } from 'react-router-dom';
+// -----------------------------------------------
+import UserProfile from '../pages/UserProfile';
 import DashboardLayout from '../layouts/dashboard';
-import SimpleLayout from '../layouts/simple';
-//
 import BlogPage from '../pages/BlogPage';
-import UserPage from '../pages/UserPage';
+import FriendsPage from '../pages/FriendsPage';
 import LoginPage from '../pages/LoginPage';
 import Page404 from '../pages/Page404';
 import ProductsPage from '../pages/ProductsPage';
@@ -13,53 +13,28 @@ import NewGoalPage from '../pages/NewGoalPage';
 import RegisterPage from '../pages/RegisterPage';
 import WelcomePage from '../pages/WelcomePage';
 import TestData from '../pages/TestData';
-import ProfilePage from '../pages/ProfilePage';
-import ChatPage from '../pages/ChatPage'
-// ----------------------------------------------------------------------
+import UpdateProfile from '../sections/profile/UpdateProfile';
+import ChatPage from '../pages/ChatPage';
 
 export default function Router() {
-  const routes = useRoutes([
-    {
-      path: '/',
-      element: <DashboardLayout />,
-      children: [
-        { element: <Navigate to="/dashboard" />, index: true },
-        { path: 'dashboard', element: <DashboardAppPage /> },
-        { path: 'friends', element: <UserPage /> },
-        { path: 'goals', element: <ProductsPage /> },
-        { path: 'blog', element: <BlogPage /> },
-        { path: 'create', element: <NewGoalPage />},
-        { path: 'welcome', element: <WelcomePage />},
-        { path: 'profile', element: <ProfilePage />},
-        { path: 'chat', element: <ChatPage />}
-      ],
-    },
-    {
-      path: 'login',
-      element: <LoginPage />
-    },
-    {
-      path: 'register',
-      element: <RegisterPage />
-    },
-
-    {
-      element: <SimpleLayout />,
-      children: [
-        { element: <Navigate to="/dashboard/app" />, index: true },
-        { path: '404', element: <Page404 /> },
-        { path: '*', element: <Navigate to="/404" /> },
-      ],
-    },
-    {
-      path: '*',
-      element: <Navigate to="/404" replace />,
-    },
-    {
-      path: 'test',
-      element: <TestData />
-    }
-  ]);
-
-  return routes;
+  return (
+    <Routes>
+      <Route path="/" element={<DashboardLayout />}>
+        <Route index element={<DashboardAppPage />} />
+        <Route path="dashboard" element={<DashboardAppPage />} />
+        <Route path="friends" element={<FriendsPage />} />
+        <Route path="goals" element={<ProductsPage />} />
+        <Route path="blog" element={<BlogPage />} />
+        <Route path="create" element={<NewGoalPage />} />
+        <Route path="welcome" element={<WelcomePage />} />
+        <Route path="chat" element={<ChatPage />} />
+        <Route path="profile" element={<UpdateProfile />} />
+        <Route path="user/:username" element={<UserProfile />} />
+      </Route>
+      <Route path="login" element={<LoginPage />} />
+      <Route path="register" element={<RegisterPage />} />
+      <Route path="test" element={<TestData />} />
+      <Route path="*" element={<Page404 />} />
+    </Routes>
+  );
 }

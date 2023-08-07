@@ -59,8 +59,15 @@
         console.log(userDataJson);
   
         setUser({
+          id: userDataJson.id,
           firstName: userDataJson.firstName,
           lastName: userDataJson.lastName,
+          username: userDataJson.username,
+          email: userDataJson.email,
+          password: userDataJson.password,
+          avatar: userDataJson.avatar,
+          friends: userDataJson.friends,
+          fund: userDataJson.fund,
         });
 
         localStorage.setItem('authToken', authToken);

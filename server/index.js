@@ -122,7 +122,7 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-// API route to get user's data like first name, last name etc. based on email on login
+// API route to get user's data based on email
 app.get('/api/user-data/:email', async (req, res) => {
   const { email } = req.params;
 
@@ -136,9 +136,43 @@ app.get('/api/user-data/:email', async (req, res) => {
 
     // Respond with the user data
     res.status(200).json({
+      id: user._id,
       firstName: user.first_name,
       lastName: user.last_name,
+      username: user.username,
+      email: user.email,
+      password: user.password,
+      avatar: user.avatar,
+      friends: user.friends,
+      fund: user.fund,
       // Include other user-related information here if available
+    });
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// API route to get user's data based on user's id
+app.get('/api/user-details/:userId', async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    // Fetch the user data based on the provided userId
+    const user = await User.findOne({ _id: userId }); // Use _id field
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Respond with the user data
+    res.status(200).json({
+      id: _id,
+      firstName: user.first_name,
+      lastName: user.last_name,
+      username: user.username,
+      email: user.email,
+      avatar: user.avatar,
     });
   } catch (error) {
     console.error('Error fetching user data:', error);
@@ -162,6 +196,80 @@ app.get('/api/users', async (req, res) => {
   } catch (error) {
     console.error('Error fetching users:', error);
     res.status(500).json({ error: 'Internal server error.' });
+  }
+});
+
+// API route to render other user's profile page
+app.get('/api/user-profile/:username', async (req, res) => {
+  const { username } = req.params;
+
+  try {
+    // Fetch the user profile data from the database based on the username
+    const userProfile = await User.findOne({ username });
+
+    if (!userProfile) {
+      return res.status(404).json({ message: 'User profile not found' });
+    }
+
+    // Do not include the user's hashed password in the response
+    userProfile.password = undefined;
+
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    
+    // Respond with the user profile data
+    res.status(200).json(userProfile);
+  } catch (error) {
+    console.error('Error fetching user profile:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// API route to get user's friends based on user ID
+app.get('/api/get-friends/:userId', async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    // Fetch the user based on the provided userId
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Respond with the user's friends array
+    res.status(200).json({ friends: user.friends });
+  } catch (error) {
+    console.error('Error fetching user friends:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// API route to add the user id from the userProfile to the friends field of the current logged-in user
+app.put('/api/update-friends/:userId', async (req, res) => {
+  const { userId } = req.params;
+  const { friends } = req.body; // Updated friends array from the request body
+
+  try {
+    // Fetch the current logged-in user based on the provided userId
+    const currentUser = await User.findById(userId);
+
+    if (!currentUser) {
+      return res.status(404).json({ message: 'Current user not found' });
+    }
+
+    // Update the user's friends with the updated friends array
+    currentUser.friends = friends;
+
+    // Save the updated current user to the database
+    await currentUser.save();
+
+    // Respond with the updated current user data
+    res.status(200).json(currentUser);
+  } catch (error) {
+    console.error('Error updating friends:', error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 });
 

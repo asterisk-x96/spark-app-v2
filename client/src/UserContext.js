@@ -7,9 +7,16 @@ export const useUserContext = () => useContext(UserContext);
 export default function UserProvider({ children }) {
   // Load user data from localStorage if available, otherwise use default values
   const initialUserData = JSON.parse(localStorage.getItem('currentUser')) || {
-    firstName: '',
-    lastName: '',
-    // You can include other user-related information here.
+    _id: '',
+    username: '',
+    first_name: '',
+    last_name: '',
+    email: '',
+    password: '',
+    avatar: '',
+    friends: [],
+    fund: 0,
+    // Include other fields from the userModel.js schema
   };
 
   const [user, setUser] = useState(initialUserData);

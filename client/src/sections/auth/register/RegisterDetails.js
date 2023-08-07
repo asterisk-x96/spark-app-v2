@@ -15,6 +15,7 @@ export default function RegisterDetails( {email} ) {
   const navigate = useNavigate();
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [emailFinal, setEmailFinal] = useState(email);
   const [showPassword, setShowPassword] = useState(false);
@@ -53,6 +54,7 @@ export default function RegisterDetails( {email} ) {
       try {
         // Rest of the handleSubmit logic for form submission
         const userData = {
+          username,
           first_name: firstName,
           last_name: lastName,
           email: emailFinal,
@@ -104,6 +106,11 @@ export default function RegisterDetails( {email} ) {
           label="Last name"
           placeholder="Doe"
           onChange={(event) => {setLastName(event.target.value)}}
+        />
+        <TextField
+          label="Username"
+          placeholder="janedoe95"
+          onChange={(event) => {setUsername(event.target.value)}}
         />
         <TextField
           label="Email"

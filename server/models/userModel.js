@@ -4,6 +4,11 @@ const { v4: uuidv4 } = require('uuid');
 
 const userSchema = new mongoose.Schema({
   _id: { type: String, default: uuidv4 },
+  username: {
+    type: String,
+    required: true,
+    unique: true
+  }, 
   first_name: String,
   last_name: String,
   email: {
@@ -15,6 +20,9 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  avatar: String,
+  friends: [String],  
+  fund: Number
 });
 
 userSchema.pre('save', async function (next) {
