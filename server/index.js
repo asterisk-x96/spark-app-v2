@@ -136,7 +136,7 @@ app.get('/api/user-data/:email', async (req, res) => {
 
     // Respond with the user data
     res.status(200).json({
-      id: user._id,
+      id: _id,
       firstName: user.first_name,
       lastName: user.last_name,
       username: user.username,
@@ -167,7 +167,7 @@ app.get('/api/user-details/:userId', async (req, res) => {
 
     // Respond with the user data
     res.status(200).json({
-      id: _id,
+      id: user._id,
       firstName: user.first_name,
       lastName: user.last_name,
       username: user.username,

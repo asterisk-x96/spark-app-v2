@@ -88,8 +88,6 @@ export default function FriendsPage() {
   const [friendDetails, setFriendDetails] = useState({});
   const { user } = useUserContext();
 
-  console.log(user);
-  
   useEffect(() => {
     const fetchFriendDetails = async (friendId) => {
       try {
@@ -101,29 +99,37 @@ export default function FriendsPage() {
         return null;
       }
     };
-
-
+  
     const fetchData = async () => {
       try {
         const response = await fetch(`http://localhost:5000/api/get-friends/${user.id}`);
         const data = await response.json();
         setUserFriends(data.friends);
-
-        const friendDetailsPromises = userFriends.map((friend) => fetchFriendDetails(friend));
-
-        const detailsArray = await Promise.all(friendDetailsPromises);
-        const detailsObject = Object.assign({}, ...detailsArray.filter(Boolean));
-        setFriendDetails(detailsObject);
-
+  
+        const friendDetailsPromises = data.friends.map((friend) => fetchFriendDetails(friend));
+  
+        const friendDetailsArray = await Promise.all(friendDetailsPromises);
+  
+        const updatedFriendDetails = friendDetailsArray.map((friendDetail, index) => {
+          if (friendDetail) {
+            const friendId = data.friends[index];
+            return { id: friendId, ...friendDetail[friendId] }; // Flatten the structure
+          }
+          return null;
+        }).filter(Boolean); // Filter out any null entries
+    
+        setFriendDetails(updatedFriendDetails);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
     };
-
-    fetchData();
-  }, [user.id]);
   
-  console.log(userFriends);
+    fetchData();
+  }, []);
+  
+
+  console.log('User"s friends:', userFriends);
+  console.log('Friends with details: ', friendDetails);
   console.log('Friends with details:', friendDetails);
 
   console.log('Number of friend:', userFriends.length);
@@ -191,113 +197,25 @@ export default function FriendsPage() {
       <Helmet>
         <title> Friends | Spark </title>
       </Helmet>
+      <Card>
+        <UserListToolbar numSelected={selected.length} filterName={filterName} onFilterName={handleFilterByName} />
 
-      <Container>
-        <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-          <Typography variant="h4" gutterBottom>
-            Friends
-          </Typography>
-          <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />}>
-            This button does something but not sure what
-          </Button>
-        </Stack>
-
-        <Card>
         <Scrollbar>
-          <TableContainer sx={{ minWidth: 800 }}>
-            <Table>
-              <UserListHead
-                order={order}
-                orderBy={orderBy}
-                headLabel={TABLE_HEAD}
-                rowCount={userFriends.length}
-                numSelected={selected.length}
-                onRequestSort={handleRequestSort}
-                onSelectAllClick={handleSelectAllClick}
-              />
-              <TableBody>
-                {userFriends.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((friend) => {
-                  const { id, name, role, status, company, avatarUrl, isVerified } = friend;
-                  const selectedUser = selected.indexOf(name) !== -1;
-
-                  return (
-                    <TableRow hover key={id} tabIndex={-1} role="checkbox" selected={selectedUser}>
-                      <TableCell padding="checkbox">
-                        <Checkbox checked={selectedUser} onChange={(event) => handleClick(event, name)} />
-                      </TableCell>
-
-                      <TableCell component="th" scope="row" padding="none">
-                        <Stack direction="row" alignItems="center" spacing={2}>
-                          <Avatar alt={name} src={avatarUrl} />
-                          <Typography variant="subtitle2" noWrap>
-                            {name}
-                          </Typography>
-                        </Stack>
-                      </TableCell>
-
-                      <TableCell align="left">{company}</TableCell>
-
-                      <TableCell align="left">{role}</TableCell>
-
-                      <TableCell align="left">{isVerified ? 'Yes' : 'No'}</TableCell>
-
-                      <TableCell align="left">
-                        <Label color={(status === 'banned' && 'error') || 'success'}>{sentenceCase(status)}</Label>
-                      </TableCell>
-
-                      <TableCell align="right">
-                        <IconButton size="large" color="inherit" onClick={handleOpenMenu}>
-                          <Iconify icon={'eva:more-vertical-fill'} />
-                        </IconButton>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-                  {emptyRows > 0 && (
-                    <TableRow style={{ height: 53 * emptyRows }}>
-                      <TableCell colSpan={6} />
-                    </TableRow>
-                  )}
-                </TableBody>
-
-                {isNotFound && (
-                  <TableBody>
-                    <TableRow>
-                      <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
-                        <Paper
-                          sx={{
-                            textAlign: 'center',
-                          }}
-                        >
-                          <Typography variant="h6" paragraph>
-                            Not found
-                          </Typography>
-
-                          <Typography variant="body2">
-                            No results found for &nbsp;
-                            <strong>&quot;{filterName}&quot;</strong>.
-                            <br /> Try checking for typos or using complete words.
-                          </Typography>
-                        </Paper>
-                      </TableCell>
-                    </TableRow>
-                  </TableBody>
-                )}
-              </Table>
-            </TableContainer>
+            <TableContainer sx={{ minWidth: 800 }}>
+                <Table>
+                    <UserListHead
+                        order={order}
+                        orderBy={orderBy}
+                        headLabel={TABLE_HEAD}
+                        rowCount={friendDetails.length}
+                        numSelected={selected.length}
+                        onRequestSort={handleRequestSort}
+                        onSelectAllClick={handleSelectAllClick}
+                    />
+                </Table>
+              </TableContainer>
           </Scrollbar>
-
-          <TablePagination
-            rowsPerPageOptions={[5, 10, 25]}
-            component="div"
-            count={userFriends.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={handleChangePage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-          />
-        </Card>
-      </Container>
+      </Card>
 
       <Popover
         open={Boolean(open)}
