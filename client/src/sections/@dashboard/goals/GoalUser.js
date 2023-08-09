@@ -65,12 +65,14 @@ export default function GoalUser({ onShowGoalDetails }) {
     setUserError(''); // Clear any previous user error
   };
 
+  console.log(selectedUser);
+
   const handleSubmit = (event) => {
     event.preventDefault();
     if (!selectedUser) {
       setUserError('Please select a user');
     } else {
-      onShowGoalDetails(selectedUser);
+      onShowGoalDetails(selectedUser, friendDetails);
     }
   };
 

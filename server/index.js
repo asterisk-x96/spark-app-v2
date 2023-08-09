@@ -7,6 +7,7 @@ const jwt = require('jsonwebtoken');
 // models
 const SampleData = require('./models/sampleData');
 const User = require('./models/userModel');
+const Goal = require('./models/goalModel')
 
 const app = express();
 const PORT = 5000;
@@ -136,7 +137,7 @@ app.get('/api/user-data/:email', async (req, res) => {
 
     // Respond with the user data
     res.status(200).json({
-      id: _id,
+      id: user._id,
       firstName: user.first_name,
       lastName: user.last_name,
       username: user.username,
@@ -271,6 +272,96 @@ app.put('/api/update-friends/:userId', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
+
+// API route to get user fund based on user id
+app.get('/api/user-fund/:userId', async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const userFund = user.fund;
+    return res.json({ fund: userFund });
+  } catch (error) {
+    console.error('Error fetching user fund:', error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+
+// API route to add money to user's fund
+app.post('/api/update-fund/:userId', express.json(), async (req, res) => {
+  const { userId, addedAmount } = req.body;
+
+  console.log(userId, addedAmount);
+  const user = await User.findById(userId);
+
+  if (!user) {
+    return res.status(404).json({ message: 'User not found' });
+  }
+
+  console.log(user);
+
+  user.fund += addedAmount;
+  await user.save();
+  res.json({ message: 'Fund added successfully', userFund: user.fund });
+});
+
+// API route to create new goal
+app.post('/api/create-goal', async (req, res) => {
+  try {
+    const {
+      title,
+      description,
+      dueDate,
+      selectedCategory,
+      buddy,
+      currentUser, // Assuming you have a way to get the current user ID
+      isPenaltyEnabled,
+      dailyPenalty,
+      uploadedImage,
+    } = req.body;
+
+    // Create a new goal instance using the Goal model
+    const newGoal = new Goal({
+      title,
+      description,
+      due_date: dueDate,
+      category: selectedCategory,
+      buddy,
+      creator: currentUser,
+      penalty_enabled: isPenaltyEnabled,
+      daily_penalty: dailyPenalty,
+      thumbnail: uploadedImage,
+      created_date: new Date().toISOString(),
+    });
+
+    // Save the new goal to the database
+    await newGoal.save();
+
+    res.json({ message: 'Goal created successfully', goal: newGoal });
+  } catch (error) {
+    console.error('Error creating goal:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// API route to get goals based on user ID
+app.get('/api/get-goals/:userId', async (req, res) => {
+  try {
+    const userId = req.params.userId;
+
+    const goals = await Goal.find({ creator: userId });
+
+    res.json({ goals });
+  } catch (error) {
+    console.error('Error fetching goals:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
 
 // Start the server
 app.listen(PORT, () => {

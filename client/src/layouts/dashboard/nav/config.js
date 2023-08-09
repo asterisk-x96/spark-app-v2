@@ -12,9 +12,14 @@ const navConfig = [
     icon: icon('ic_dashboard'),
   },
   {
-    title: 'goals',
+    title: 'my goals',
     path: '/goals',
     icon: icon('ic_goals'),
+  },
+  {
+    title: 'My Fund',
+    path: '/my-fund',
+    icon: icon('ic_lock'),
   },
   {
     title: 'friends',
@@ -26,21 +31,7 @@ const navConfig = [
     path: '/chat',
     icon: icon('ic_chat'),
   },
-  {
-    title: 'blog',
-    path: '/blog',
-    icon: icon('ic_blog'),
-  },
-  {
-    title: 'login',
-    path: '/login',
-    icon: icon('ic_lock'),
-  },
-  {
-    title: 'Not found',
-    path: '/404',
-    icon: icon('ic_disabled'),
-  },
+
 ];
 
 export default navConfig;

@@ -32,7 +32,8 @@ export default function NewGoalPage() {
   const [showGoalUser, setShowGoalUser] = useState(false);
   const [showGoalDetails, setShowGoalDetails] = useState(false);
   const [goalTitle, setGoalTitle] = useState('');
-  const [goalUser, setGoalUser] = useState('');
+  const [selectedUser, setSelectedUser] = useState('');
+  const [friendDetails, setFriendDetails] = useState([]);
 
   const handleShowGoalUser = (title) => {
     setGoalTitle(title);
@@ -40,8 +41,9 @@ export default function NewGoalPage() {
     setShowGoalUser(true);
   };
 
-  const handleShowGoalDetails = (user) => {
-    setGoalUser(user);
+  const handleShowGoalDetails = (user, friendDetails) => {
+    setSelectedUser(user);
+    setFriendDetails(friendDetails);
     setShowGoalUser(false);
     setShowGoalDetails(true);
   }
@@ -56,7 +58,12 @@ export default function NewGoalPage() {
           <StyledContent>
             {showGoalTitle && <GoalTitle onShowGoalUser={handleShowGoalUser} />}
             {showGoalUser && <GoalUser onShowGoalDetails={handleShowGoalDetails} />}
-            {showGoalDetails && <GoalDetails title={goalTitle} user={goalUser}/>}
+            {showGoalDetails 
+              && <GoalDetails 
+                title={goalTitle} 
+                selectedUser={selectedUser}
+                friendDetails={friendDetails}
+                />}
           </StyledContent>
         </Container>
       </StyledRoot>
