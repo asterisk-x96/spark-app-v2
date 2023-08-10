@@ -12,6 +12,7 @@ import {
 import { Autocomplete, LoadingButton } from '@mui/lab';
 import { useUserContext } from '../../../UserContext'; // Import the useUserContext hook
 
+// --------------------------------------------------------------------------------
 
 export default function GoalUser({ onShowGoalDetails }) {
   const [selectedUser, setSelectedUser] = useState('');

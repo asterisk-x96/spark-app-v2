@@ -1,39 +1,35 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { Grid, Container, Typography } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
-import Iconify from '../components/iconify';
 import { AppWidgetSummary } from '../sections/@dashboard/app';
 import { useUserContext } from '../UserContext';
-
-// ---------------------------------------------------------------------------------------------------------------
-
+import useGetGoalsByUserId from '../api/useGetGoalsByUserId'; // Import the custom hook
 
 export default function DashboardAppPage() {
   const { user } = useUserContext();
-  const theme = useTheme();
   const navigate = useNavigate();
-  const [latestGoals, setLatestGoals] = useState([]); 
+
+  // Use the custom hook to fetch goals
+  const goals = useGetGoalsByUserId().slice(0,3);
+
+  console.log(goals);
+
+  const colors = ['add', 'info', 'error', 'warning']; // Adjust the colors based on your needs
+  const icons = {
+    add: 'entypo:circle-with-plus',
+    info: 'ant-design:apple-filled',
+    error: 'ant-design:windows-filled',
+    warning: 'ant-design:bug-filled',
+  }; // Adjust the icons based on your needs
 
   const handleClick = () => {
     navigate('/create', { replace: true });
   };
 
-  useEffect(() => {
-    // Fetch the latest goal data from the backend
-    const fetchLatestGoals = async () => {
-      try {
-        const response = await fetch('http://localhost:5000/api/latest-goals'); // Replace with your API endpoint
-        const data = await response.json();
-        setLatestGoals(data.goals); // Update the state with the latest goals
-      } catch (error) {
-        console.error('Error fetching latest goals:', error);
-      }
-    };
-
-    fetchLatestGoals();
-  }, []); // Empty dependency array means this effect runs once on component mount
+  const handleClickGoal = (goal) => {
+    navigate(`/goal/${goal._id}`);
+  }
 
   return (
     <>
@@ -42,50 +38,33 @@ export default function DashboardAppPage() {
       </Helmet>
 
       <Container maxWidth="xl">
-
         <Typography variant="h4" sx={{ mb: 5 }}>
           Welcome back, {user.firstName}!
         </Typography>
 
         <Grid container spacing={3}>
-
           <Grid item xs={12} sm={6} md={3}>
-            <AppWidgetSummary title="Add Goal" onClick={handleClick} color="add" icon={'entypo:circle-with-plus'} />
+              <AppWidgetSummary 
+                title={'Add Goal'} 
+                color={colors[0]} 
+                icon={icons[colors[0]]}
+                onClick={handleClick} />
           </Grid>
 
+        {goals.map((goal, index) => (
+        <Grid key={index} item xs={12} sm={6} md={3}>
+          {/* Display goals */}
+          <AppWidgetSummary
+            title={goal.title}
+            total={goal.daily_penalty}
+            color={colors[index + 1]}
+            icon={icons[colors[index + 1]]}
+            onClick={() => handleClickGoal(goal)}
+          />
+        </Grid>
+      ))}
 
-          <Grid item xs={12} sm={6} md={3}>
-            {/* Display the FIRST latest goal */}
-            <AppWidgetSummary
-              title={latestGoals.length > 0 ? latestGoals[0].title : 'No Goals'}
-              total={1352831}
-              color="info"
-              icon={'ant-design:apple-filled'}
-            />
-          </Grid>
-          
-          <Grid item xs={12} sm={6} md={3}>
-            {/* Display the second latest goal */}
-            <AppWidgetSummary
-              title={latestGoals.length > 1 ? latestGoals[1].title : 'No Goals'}
-              total={1352831}
-              color="error"
-              icon={'ant-design:apple-filled'}
-            />
-          </Grid>
-
-          <Grid item xs={12} sm={6} md={3}>
-            {/* Display the second latest goal */}
-            <AppWidgetSummary
-              title={latestGoals.length > 1 ? latestGoals[1].title : 'No Goals'}
-              total={1352831}
-              color="warning"
-              icon={'ant-design:apple-filled'}
-            />
-          </Grid>
-
-      </Grid>
-
+        </Grid>
       </Container>
     </>
   );

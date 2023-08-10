@@ -85,7 +85,6 @@ export default function RegisterDetails( {email} ) {
 
         navigate('/welcome', { replace: true });
 
-        // You can handle success behavior here, like showing a success message or navigating to a different page.
       } catch (error) {
         // Handle registration error
         console.error('Error registering user:', error.message);

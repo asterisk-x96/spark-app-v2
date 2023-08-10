@@ -46,7 +46,7 @@ export default function RegisterPage() {
 
 
   const [showRegisterForm, setShowRegisterForm] = useState(true)
-  const [showRegisterDetails, setShowRegisterDetails   ] = useState(false);
+  const [showRegisterDetails, setShowRegisterDetails] = useState(false);
   const [email, setEmail] = useState('');
 
   const handleShowRegisterDetails = (email) => {

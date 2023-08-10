@@ -17,7 +17,7 @@ const StyledIcon = styled('div')(({ theme }) => ({
   width: theme.spacing(8),
   height: theme.spacing(8),
   justifyContent: 'center',
-  marginBottom: theme.spacing(3),
+  marginBottom: theme.spacing(5),
 }));
 
 // ----------------------------------------------------------------------
@@ -26,7 +26,6 @@ AppWidgetSummary.propTypes = {
   color: PropTypes.string,
   icon: PropTypes.string,
   title: PropTypes.string.isRequired,
-  total: PropTypes.number.isRequired,
   sx: PropTypes.object,
 };
 
@@ -47,11 +46,9 @@ export default function AppWidgetSummary({ title, total, icon, color = 'primary'
               <Iconify icon={icon} width={30} height={30} />
       </StyledIcon>
 
-      <Typography variant="h3">{fShortenNumber(total)}</Typography>
+      <Typography variant="h6">{title}</Typography>
 
-      <Typography variant="subtitle2" sx={{ opacity: 0.72 }}>
-        {title}
-      </Typography>
+
     </Card>
   );
 }

@@ -13,6 +13,7 @@ import {
   MenuItem,
   Select,
   TextField,
+  TableContainer
 } from '@mui/material';
 
 import { useUserContext } from '../UserContext'; // Import the useUserContext hook
@@ -20,7 +21,7 @@ import { useUserContext } from '../UserContext'; // Import the useUserContext ho
 
 import Iconify from '../components/iconify';
 
-const fundingOption = ['Barclays', 'Revolut'];
+const fundingOption = ['Debit card', 'Credit card', 'Paypal'];
 
 export default function UserFundPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -94,7 +95,6 @@ export default function UserFundPage() {
         body: JSON.stringify({ userId: currentUserId, addedAmount }) // Convert data to JSON format
       });
       const data = await response.json();
-      // You might want to handle the response from the back-end here
     } catch (error) {
       console.error('Error adding fund:', error);
     }
@@ -116,29 +116,29 @@ const handleCloseSuccessDialog = () => {
         <title> My Goals | Spark </title>
       </Helmet>
 
-      <Container>
+      <Container  sx={{ backgroundColor: 'white', boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',padding: '50px', borderRadius: '20px'}}>
         <Stack direction="row" justifyContent="space-between" mb={2}>
           <Typography variant="h4" gutterBottom>
-            My Fund
+            Total Fund
           </Typography>
-          <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleOpenDialog}>
-            Add fund
-          </Button>
+
         </Stack>
 
         <Stack direction="column" alignItems="center" justifyContent="center">
           <Stack direction="row" alignItems="center" justifyContent="center" height="20vh">
             <Typography variant="h2" gutterBottom>
-              <span role="img" aria-label="British Pound" style={{ fontSize: '3rem' }}>
+              <span role="img" aria-label="British Pound" style={{ fontSize: '4rem' }}>
                 💷
               </span>
-              <span style={{ fontSize: '3rem', marginLeft: '0.5rem' }}>{userFund}</span>
+              <span style={{ fontSize: '4rem', marginLeft: '0.5rem' }}>{userFund}</span>
             </Typography>
           </Stack>
 
-          <Typography variant="h3" gutterBottom>
-            Total fund
-          </Typography>
+          <Stack direction="row" alignItems="center" justifyContent="center" mt={0}>
+            <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleOpenDialog}>
+              Add fund
+            </Button>
+        </Stack>
         </Stack>
       </Container>
 

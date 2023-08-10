@@ -1,15 +1,21 @@
 const express = require('express');
+const http = require('http');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const multer = require('multer');
+const path = require('path');
+
 // models
 const SampleData = require('./models/sampleData');
 const User = require('./models/userModel');
 const Goal = require('./models/goalModel')
+const Message = require('./models/messageModel')
 
 const app = express();
+const server = http.createServer(app);
 const PORT = 5000;
 
 // Middleware
@@ -92,7 +98,7 @@ app.get('/api/user/check-email/:email', async (req, res) => {
   }
 });
 
-//API route to handle user login from front-end
+// API route to handle user login from front-end
 app.post('/api/login', async (req, res) => {
   const  { email, password } = req.body;
   console.log(email);
@@ -321,7 +327,7 @@ app.post('/api/create-goal', async (req, res) => {
       currentUser, // Assuming you have a way to get the current user ID
       isPenaltyEnabled,
       dailyPenalty,
-      uploadedImage,
+      imageUrl,
     } = req.body;
 
     // Create a new goal instance using the Goal model
@@ -334,7 +340,6 @@ app.post('/api/create-goal', async (req, res) => {
       creator: currentUser,
       penalty_enabled: isPenaltyEnabled,
       daily_penalty: dailyPenalty,
-      thumbnail: uploadedImage,
       created_date: new Date().toISOString(),
     });
 
@@ -353,7 +358,7 @@ app.get('/api/get-goals/:userId', async (req, res) => {
   try {
     const userId = req.params.userId;
 
-    const goals = await Goal.find({ creator: userId });
+    const goals = await Goal.find({ $or: [{ creator: userId }, { buddy: userId }] });
 
     res.json({ goals });
   } catch (error) {
@@ -362,6 +367,50 @@ app.get('/api/get-goals/:userId', async (req, res) => {
   }
 });
 
+// API endpoint to get goal details based on goal ID
+app.get('/api/get-goal-details/:goalId', async (req, res) => {
+  try {
+    const goalId = req.params.goalId;
+
+    const goal = await Goal.findById(goalId);
+
+    if (!goal) {
+      return res.status(404).json({ error: 'Goal not found' });
+    }
+
+    res.json({ goal });
+  } catch (error) {
+    console.error('Error fetching goal details:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+// Define storage for uploaded files
+
+const uploadDirectory = path.join(__dirname, 'images'); // Replace 'uploads' with your desired folder name
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, uploadDirectory);
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() +  '-'+ file.originalname);
+  },
+});
+
+const upload = multer({ storage: storage });
+
+// Handle file upload
+app.post('/api/upload', upload.single('file'), (req, res) => {
+  const file = req.file;
+
+  if (!file) {
+    return res.status(400).json({ error: 'No file uploaded' });
+  }
+
+  const url = `http://localhost:5000/uploads/${file.filename}`;
+  return res.json({ url });
+});
 
 // Start the server
 app.listen(PORT, () => {

@@ -17,7 +17,6 @@ const goalSchema = new mongoose.Schema({
     daily_penalty: Number,
     penalty_fund: Number,
     complete_status: Boolean,
-    thumbnail: String,
     created_date: String
   });
 

@@ -22,6 +22,7 @@ import { LoadingButton } from '@mui/lab';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import { useUserContext } from '../../../UserContext';
 
+
 // -------------------------------------------------------------------------
 
 const categoryList = [
@@ -34,15 +35,15 @@ export default function GoalDetails({ title, selectedUser, friendDetails }) {
   const { user } = useUserContext();
   const [titleFinal, setTitleFinal] = useState(title);
   const [description, setDescription] = useState('');
-  const [dueDate, setDueDate] = useState(null);
-  const [dueTime, setDueTime] = useState(null);
+  const [dueDate, setDueDate] = useState('');
+  const [dueTime, setDueTime] = useState('');
   const [buddy, setBuddy] = useState(selectedUser.id);
   const [isFriendEditing, setIsFriendEditing] = useState(false);
   const [isTitleEditing, setIsTitleEditing] = useState(false);
   const [isPenaltyEnabled, setIsPenaltyEnabled] = useState(false);
   const [dailyPenalty, setDailyPenalty] = useState(0);
   const [selectedCategory, setSelectedCategory] = useState('');
-  const [uploadedImage, setUploadedImage] = useState(null); // State to store the uploaded image URL
+
 
   console.log("Selected user: ", selectedUser);
   console.log("Buddy: ", buddy);
@@ -71,16 +72,6 @@ export default function GoalDetails({ title, selectedUser, friendDetails }) {
     setIsPenaltyEnabled(event.target.checked);
   };
 
-  const handleImageUpload = (event) => {
-    const file = event.target.files[0];
-  
-    // Create a temporary URL for the uploaded image
-    const imageUrl = URL.createObjectURL(file);
-  
-    setUploadedImage(imageUrl);
-  };
-
-
   const handleSubmit = async (event) => {
     event.preventDefault();
   
@@ -100,7 +91,6 @@ export default function GoalDetails({ title, selectedUser, friendDetails }) {
           currentUser: user.id,
           isPenaltyEnabled,
           dailyPenalty: parseInt(dailyPenalty, 10),
-          uploadedImage,
         }),
       });
   
@@ -206,35 +196,6 @@ export default function GoalDetails({ title, selectedUser, friendDetails }) {
         )}
       </Stack>
       
-      <Divider sx={{ my: 3 }} />
-
-      <Typography variant="h6" sx={{ px: 0, mt: 0 }}>
-        Thumbnail
-      </Typography>
-
-      <Typography sx={{ px: 0, mt: 0 }}>
-        Upload an image that represents your goal's spirit
-      </Typography>
-
-      <FormControl sx={{ mt: 2 }}>
-        <Input
-          type="file"
-          inputProps={{
-            accept: 'image/*',
-            onChange: handleImageUpload,
-          }}
-        />
-      </FormControl>
-
-      {/* Display the uploaded image */}
-      {uploadedImage && (
-        <img
-          src={uploadedImage}
-          alt="Uploaded thumbnail"
-          style={{ maxWidth: '100%', marginTop: '1rem' }}
-        />
-      )}
-
       <Divider sx={{ my: 3 }} />
 
       <Stack direction="column" spacing={0} sx={{ mb: 3 }} size="small">

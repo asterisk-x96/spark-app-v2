@@ -20,7 +20,6 @@ export default function UpdateProfile() {
       profilePicture,
     }));
 
-    // You can also send the updated user data to the server here if needed.
 
     // Show a success message or redirect to another page after saving changes.
   };
