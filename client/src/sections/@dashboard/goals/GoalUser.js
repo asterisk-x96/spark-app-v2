@@ -77,8 +77,6 @@ export default function GoalUser({ onShowGoalDetails }) {
     }
   };
 
-
-
   return (
     <form onSubmit={handleSubmit}>
       <Typography variant="h4" gutterBottom>

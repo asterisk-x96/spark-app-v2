@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Helmet } from 'react-helmet-async';
 import {
-  Grid,
   Button,
   Container,
   Stack,
@@ -13,40 +11,49 @@ import {
   MenuItem,
   Select,
   TextField,
-  TableContainer
 } from '@mui/material';
 
-import { useUserContext } from '../UserContext'; // Import the useUserContext hook
+import useGetUserDetails from '../api/useGetCurrentUserDetails'; // Import the custom hook
 
 
-import Iconify from '../components/iconify';
-
-const fundingOption = ['Debit card', 'Credit card', 'Paypal'];
+const fundingOptions = ['Debit card', 'Credit card'];
 
 export default function UserFundPage() {
+  const userDetails = useGetUserDetails();
+  const [isAmountDialogOpen, setIsAmountDialogOpen] = useState(false);
+
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isNextDialogOpen, setIsNextDialogOpen] = useState(false);
+  const [isCardDetailsDialogOpen, setIsCardDetailsDialogOpen] = useState(false);
   const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] = useState(false);
-  const { user } = useUserContext();
-  const [userFund, setUserFund] = useState(null);
-  const [addedAmount, setAddedAmount] = useState(0);
-  const currentUserId = user.id;
-  const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false); // New state for success dialog
+  const [userFund, setUserFund] = useState(0);
+  const [addedAmount, setAddedAmount] = useState('');
+  const [isSuccessDialogOpen, setIsSuccessDialogOpen] = useState(false);
+  const [selectedFundingOption, setSelectedFundingOption] = useState(fundingOptions[0]);
+
+  const [cardNumber, setCardNumber] = useState('');
+  const [expiryMonth, setExpiryMonth] = useState('');
+  const [expiryYear, setExpiryYear] = useState('');
+  const [cvc, setCVC] = useState('');
+  const [cardNumberError, setCardNumberError] = useState('');
+  const [expiryMonthError, setExpiryMonthError] = useState('');
+  const [expiryYearError, setExpiryYearError] = useState('');
+  const [cvcError, setCVCError] = useState('');
+  const [isAmountError, setIsAmountError] = useState(false);
 
 
+  
   useEffect(() => {
-    // Fetch user's fund from the backend
-    const fetchUserFund = async () => {
-      try {
-        const response = await fetch(`http://localhost:5000/api/user-fund/${currentUserId}`);
-        const data = await response.json();
-        setUserFund(data.fund);
-      } catch (error) {
-        console.error('Error fetching user fund:', error);
-      }
-    };
-    fetchUserFund();
-  }, [currentUserId]); // Fetch whenever the currentUserId changes
+    setUserFund(userDetails.fund || 0);
+  }, [userDetails]);
+
+  const handleOpenAmountDialog = () => {
+    setIsAmountDialogOpen(true);
+  };
+
+  const handleCloseAmountDialog = () => {
+    setIsAmountDialogOpen(false);
+  };
+
 
   const handleOpenDialog = () => {
     setIsDialogOpen(true);
@@ -56,13 +63,17 @@ export default function UserFundPage() {
     setIsDialogOpen(false);
   };
 
-  const handleOpenNextDialog = () => {
-    setIsNextDialogOpen(true);
+  const handleOpenCardDetailsDialog = () => {
+    setIsCardDetailsDialogOpen(true);
     handleCloseDialog(); // Close the previous dialog
   };
 
-  const handleCloseNextDialog = () => {
-    setIsNextDialogOpen(false);
+  const handleCloseCardDetailsDialog = () => {
+    setIsCardDetailsDialogOpen(false);
+  };
+
+  const handleFundingOptionChange = (event) => {
+    setSelectedFundingOption(event.target.value);
   };
 
   const handleOpenConfirmationDialog = () => {
@@ -74,8 +85,32 @@ export default function UserFundPage() {
   };
 
   const handleAddAmount = (amount) => {
-    setAddedAmount(amount);
-    handleOpenConfirmationDialog();
+    if (cardNumber === '') {
+      setCardNumberError('Card number is required');
+    } else {
+      setCardNumberError('');
+    }
+    if (expiryMonth === '') {
+      setExpiryMonthError('Expiry month is required');
+    } else {
+      setExpiryMonthError('');
+    }
+    if (expiryYear === '') {
+      setExpiryYearError('Expiry year is required');
+    } else {
+      setExpiryYearError('');
+    }
+    if (cvc === '') {
+      setCVCError('CVC is required');
+    } else {
+      setCVCError('');
+    }
+  
+    // If all fields are filled, proceed to the confirmation dialog
+    if (cardNumber !== '' && expiryMonth !== '' && expiryYear !== '' && cvc !== '') {
+      setAddedAmount(amount);
+      handleOpenConfirmationDialog();
+    }
   };
 
   const handleConfirmAddAmount = async () => {
@@ -87,19 +122,19 @@ export default function UserFundPage() {
     handleCloseConfirmationDialog();
   
     try {
-      const response = await fetch(`http://localhost:5000/api/update-fund/${currentUserId}`, {
+      const response = await fetch(`http://localhost:5000/api/update-fund/${userDetails.id}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json' // Specify the content type as JSON
         },
-        body: JSON.stringify({ userId: currentUserId, addedAmount }) // Convert data to JSON format
+        body: JSON.stringify({ userId: userDetails.id, addedAmount }) // Convert data to JSON format
       });
       const data = await response.json();
     } catch (error) {
       console.error('Error adding fund:', error);
     }
   
-    handleCloseNextDialog();
+    handleCloseCardDetailsDialog();
   
     // Open the success dialog
     setIsSuccessDialogOpen(true);
@@ -112,9 +147,7 @@ const handleCloseSuccessDialog = () => {
 
   return (
     <>
-      <Helmet>
-        <title> My Goals | Spark </title>
-      </Helmet>
+
 
       <Container  sx={{ backgroundColor: 'white', boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',padding: '50px', borderRadius: '20px'}}>
         <Stack direction="row" justifyContent="space-between" mb={2}>
@@ -135,18 +168,46 @@ const handleCloseSuccessDialog = () => {
           </Stack>
 
           <Stack direction="row" alignItems="center" justifyContent="center" mt={0}>
-            <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleOpenDialog}>
+            <Button variant="contained" onClick={handleOpenAmountDialog}>
               Add fund
             </Button>
         </Stack>
         </Stack>
       </Container>
 
+      <Dialog open={isAmountDialogOpen} onClose={handleCloseAmountDialog} maxWidth="sm" fullWidth>
+        <DialogTitle>Enter Amount</DialogTitle>
+        <DialogContent>
+          <TextField
+            fullWidth
+            label="Enter an amount"
+            type="number"
+            value={addedAmount}
+            onChange={(e) => setAddedAmount(Number(e.target.value))}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button
+            color="primary"
+            onClick={() => {
+              if (addedAmount > 0) {
+                handleOpenDialog();
+                handleCloseAmountDialog();
+              }
+            }}
+          >
+            Next
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       <Dialog open={isDialogOpen} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
         <DialogTitle>Add Fund</DialogTitle>
         <DialogContent>
-          <Select fullWidth>
-            {fundingOption.map((option) => (
+          <Typography sx={{ my : 2, color: 'rgba(0, 0, 0, 0.6)' }}> Select your funding source </Typography>
+          <Select fullWidth value={selectedFundingOption} onChange={handleFundingOptionChange}>
+
+            {fundingOptions.map((option) => (
               <MenuItem key={option} value={option}>
                 {option}
               </MenuItem>
@@ -154,7 +215,7 @@ const handleCloseSuccessDialog = () => {
           </Select>
         </DialogContent>
         <DialogActions>
-          <Button color="primary" onClick={handleOpenNextDialog}>
+          <Button color="primary" onClick={handleOpenCardDetailsDialog}>
             Next
           </Button>
           <Button onClick={handleCloseDialog} color="error">
@@ -163,21 +224,73 @@ const handleCloseSuccessDialog = () => {
         </DialogActions>
       </Dialog>
 
-      <Dialog open={isNextDialogOpen} onClose={handleCloseNextDialog} maxWidth="sm" fullWidth>
+      <Dialog open={isCardDetailsDialogOpen} onClose={handleCloseCardDetailsDialog} maxWidth="sm" fullWidth>
       <DialogTitle>Set your funding</DialogTitle>
+      <Typography sx={{ my: 0, mx: 3, color: 'rgba(0, 0, 0, 0.6)' }}> Input your card details </Typography>
       <DialogContent>
         <TextField
           fullWidth
-          label="Amount"
+          label="Card number"
           type="number"
-          onChange={(e) => setAddedAmount(Number(e.target.value))}
+          sx={{ my: 1 }}
+          error={cardNumberError !== ''}
+          helperText={cardNumberError}
+          onChange={(e) => {
+            setCardNumber(e.target.value);
+            setCardNumberError('');
+          }}
+        />
+
+        {/* Expiry Date */}
+        <Stack direction="row" sx={{ my: 1 }}>
+          <TextField
+            width="10%"
+            label="Expiry month"
+            type="number"
+            inputProps={{ maxLength: 2 }} 
+            placeholder="mm"
+            error={expiryMonthError !== ''}
+            helperText={expiryMonthError}
+            onChange={(e) => {
+              setExpiryMonth(e.target.value);
+              setExpiryMonthError('');
+            }}
+          />
+          <Typography variant="h3" sx={{ mx: 3 }}>/</Typography>
+          <TextField
+            width="10px"
+            type="number"
+            placeholder="yy"
+            sx={{ mx: 0 }}
+            inputProps={{ maxLength: 2 }} 
+            error={expiryYearError !== ''}
+            helperText={expiryYearError}
+            onChange={(e) => {
+              setExpiryYear(e.target.value);
+              setExpiryYearError('');
+            }}
+          />
+        </Stack>
+
+        {/* CVC */}
+        <TextField
+          width="10%"
+          label="CVC"
+          type="number"
+          sx={{ my: 2 }}
+          error={cvcError !== ''}
+          helperText={cvcError}
+          onChange={(e) => {
+            setCVC(e.target.value);
+            setCVCError('');
+          }}
         />
       </DialogContent>
       <DialogActions>
         <Button color="primary" onClick={() => handleAddAmount(addedAmount)}>
           Next
         </Button>
-        <Button onClick={handleCloseNextDialog} color="error">
+        <Button onClick={handleCloseCardDetailsDialog} color="error">
           Cancel
         </Button>
       </DialogActions>

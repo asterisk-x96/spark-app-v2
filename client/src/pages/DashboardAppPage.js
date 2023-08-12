@@ -4,10 +4,12 @@ import { Helmet } from 'react-helmet-async';
 import { Grid, Container, Typography } from '@mui/material';
 import { AppWidgetSummary } from '../sections/@dashboard/app';
 import { useUserContext } from '../UserContext';
-import useGetGoalsByUserId from '../api/useGetGoalsByUserId'; // Import the custom hook
+import useGetGoalsByUserId from '../api/useGetGoalsByUserId';
+import useGetUserDetails from '../api/useGetCurrentUserDetails'; // Import the custom hook
+
 
 export default function DashboardAppPage() {
-  const { user } = useUserContext();
+  const userDetails = useGetUserDetails();
   const navigate = useNavigate();
 
   // Use the custom hook to fetch goals
@@ -39,7 +41,7 @@ export default function DashboardAppPage() {
 
       <Container maxWidth="xl">
         <Typography variant="h4" sx={{ mb: 5 }}>
-          Welcome back, {user.firstName}!
+          Welcome back, {userDetails.firstName}!
         </Typography>
 
         <Grid container spacing={3}>

@@ -24,12 +24,20 @@ export default function UserProvider({ children }) {
   useEffect(() => {
     // Save user data to localStorage whenever it changes
     localStorage.setItem('currentUser', JSON.stringify(user));
+    console.log('User data saved to localStorage:', user);
+
   }, [user]);
+
+
+  const logout = () => {
+    setUser(null);
+  }
 
   console.log('User data in UserContext.js:', user);
 
+
   return (
-    <UserContext.Provider value={{ user, setUser }}>
+    <UserContext.Provider value={{ user, setUser, logout }}>
       {children}
     </UserContext.Provider>
   );

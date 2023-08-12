@@ -12,7 +12,6 @@ const path = require('path');
 const SampleData = require('./models/sampleData');
 const User = require('./models/userModel');
 const Goal = require('./models/goalModel')
-const Message = require('./models/messageModel')
 
 const app = express();
 const server = http.createServer(app);
@@ -179,6 +178,10 @@ app.get('/api/user-details/:userId', async (req, res) => {
       lastName: user.last_name,
       username: user.username,
       avatar: user.avatar,
+      bio: user.bio,
+      email: user.email,
+      fund: user.fund,
+      password: user.password
     });
   } catch (error) {
     console.error('Error fetching user data:', error);
@@ -327,7 +330,8 @@ app.post('/api/create-goal', async (req, res) => {
       currentUser, // Assuming you have a way to get the current user ID
       isPenaltyEnabled,
       dailyPenalty,
-      imageUrl,
+      fund,
+      isCompleted
     } = req.body;
 
     // Create a new goal instance using the Goal model
@@ -341,6 +345,8 @@ app.post('/api/create-goal', async (req, res) => {
       penalty_enabled: isPenaltyEnabled,
       daily_penalty: dailyPenalty,
       created_date: new Date().toISOString(),
+      fund,
+      isCompleted
     });
 
     // Save the new goal to the database
@@ -385,32 +391,104 @@ app.get('/api/get-goal-details/:goalId', async (req, res) => {
   }
 });
 
-// Define storage for uploaded files
 
-const uploadDirectory = path.join(__dirname, 'images'); // Replace 'uploads' with your desired folder name
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, uploadDirectory);
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() +  '-'+ file.originalname);
-  },
-});
+// API to search for user by name, username or email
+app.get('/api/search-users', async (req, res) => {
+  const searchQuery = req.query.q;
+  
+  try {
+    const results = await User.find({
+      $or: [
+        { firstName: { $regex: searchQuery, $options: 'i' } },
+        { lastName: { $regex: searchQuery, $options: 'i' } },
+        { email: { $regex: searchQuery, $options: 'i' } },
+        { username: { $regex: searchQuery, $options: 'i' } },
+      ],
+    });
 
-const upload = multer({ storage: storage });
-
-// Handle file upload
-app.post('/api/upload', upload.single('file'), (req, res) => {
-  const file = req.file;
-
-  if (!file) {
-    return res.status(400).json({ error: 'No file uploaded' });
+    res.json({ results });
+  } catch (error) {
+    console.error('Error searching users:', error);
+    res.status(500).json({ error: 'Failed to search users' });
   }
-
-  const url = `http://localhost:5000/uploads/${file.filename}`;
-  return res.json({ url });
 });
+
+// API to update user profile
+app.put('/api/update-user/:userId', async (req, res) => {
+  const userId = req.params.userId;
+  const {
+    firstName,
+    lastName,
+    bio,
+    email,
+    profilePicture
+  } = req.body;
+
+  try {
+    // Fetch the user based on the provided userId
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Update the user's profile fields
+    user.first_name = firstName;
+    user.last_name = lastName;
+    user.bio = bio;
+    user.email = email;
+    user.avatar = profilePicture;
+
+    // Save the updated user to the database
+    await user.save();
+
+    // Respond with the updated user data
+    res.status(200).json(user);
+  } catch (error) {
+    console.error('Error updating user profile:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+// API route to update user password
+app.post('/update-password/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { currentPassword, newPassword } = req.body;
+
+    // Find the user by userId
+    const user = await User.findOne({ _id: userId });
+
+    // Check if the user exists
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Compare the provided current password with the stored hashed password
+    const isPasswordValid = await bcrypt.compare(
+      currentPassword,
+      user.password
+    );
+
+    if (!isPasswordValid) {
+      return res.status(401).json({ error: 'Invalid current password' });
+    }
+
+    // Hash the new password
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update the user's password with the new hashed password
+    user.password = hashedNewPassword;
+    await user.save();
+
+    res.status(200).json({ message: 'Password updated successfully' });
+  } catch (error) {
+    console.error('Error updating password:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 
 // Start the server
 app.listen(PORT, () => {

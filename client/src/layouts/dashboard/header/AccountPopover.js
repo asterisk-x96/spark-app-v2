@@ -5,6 +5,7 @@ import { Box, Divider, Typography, Stack, MenuItem, Avatar, IconButton, Popover 
 import { useNavigate } from 'react-router-dom';
 // mocks_
 import account from '../../../data/account';
+import { useUserContext } from '../../../UserContext';
 
 
 // ----------------------------------------------------------------------
@@ -20,11 +21,9 @@ const MENU_OPTIONS = [
     icon: 'eva:person-fill',
     path: '/profile'
   },
-  {
-    label: 'Settings',
-    icon: 'eva:settings-2-fill',
-    path: 'settings'
-  },
+  { label: 'Reset Password',
+    icon: '',
+    path: 'reset-password'}
 ];
 
 // ----------------------------------------------------------------------
@@ -32,6 +31,8 @@ const MENU_OPTIONS = [
 export default function AccountPopover() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(null);
+
+  const { logout } = useUserContext();
 
   const handleOpen = (event) => {
     setOpen(event.currentTarget);
@@ -42,6 +43,7 @@ export default function AccountPopover() {
   };
 
   const handleLogOut = () => {
+    logout();
     localStorage.removeItem('authToken');
     window.location.replace('/login');
   }
@@ -50,6 +52,7 @@ export default function AccountPopover() {
     navigate(path);
     handleClose(); 
   };
+
 
   return (
     <>

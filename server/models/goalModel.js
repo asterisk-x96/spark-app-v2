@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const { v4: uuidv4 } = require('uuid'); 
 
-
 const goalSchema = new mongoose.Schema({
     _id: { type: String, default: uuidv4 },
     title: {
@@ -16,8 +15,9 @@ const goalSchema = new mongoose.Schema({
     penalty_enabled: Boolean,
     daily_penalty: Number,
     penalty_fund: Number,
-    complete_status: Boolean,
-    created_date: String
+    isCompleted: Boolean,
+    created_date: String,
+    fund: Number
   });
 
 const Goal = mongoose.model('Goal', goalSchema);

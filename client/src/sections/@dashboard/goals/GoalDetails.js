@@ -13,7 +13,6 @@ import {
   MenuItem,
   Switch,
   FormControlLabel,
-  Input
 } from '@mui/material';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -21,16 +20,8 @@ import { DatePicker, TimePicker } from '@mui/x-date-pickers';
 import { LoadingButton } from '@mui/lab';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import { useUserContext } from '../../../UserContext';
-
-
+import { categoryList } from '../../../data/goals';
 // -------------------------------------------------------------------------
-
-const categoryList = [
-  'Category 1',
-  'Category 2',
-  'Category 3',
-];
-
 export default function GoalDetails({ title, selectedUser, friendDetails }) {
   const { user } = useUserContext();
   const [titleFinal, setTitleFinal] = useState(title);
@@ -43,10 +34,6 @@ export default function GoalDetails({ title, selectedUser, friendDetails }) {
   const [isPenaltyEnabled, setIsPenaltyEnabled] = useState(false);
   const [dailyPenalty, setDailyPenalty] = useState(0);
   const [selectedCategory, setSelectedCategory] = useState('');
-
-
-  console.log("Selected user: ", selectedUser);
-  console.log("Buddy: ", buddy);
 
   const handleTitleEdit = (event) => {
     setIsTitleEditing(true);
@@ -87,10 +74,12 @@ export default function GoalDetails({ title, selectedUser, friendDetails }) {
           dueDate,
           dueTime,
           selectedCategory,
-          buddy,
+          buddy: buddy.id,
           currentUser: user.id,
           isPenaltyEnabled,
           dailyPenalty: parseInt(dailyPenalty, 10),
+          fund: 0,
+          isCompleted: false,
         }),
       });
   
@@ -145,12 +134,48 @@ export default function GoalDetails({ title, selectedUser, friendDetails }) {
         fullWidth
         onChange={(event) => setDescription(event.target.value)}
       />
+
+
+      <Divider sx={{ my: 3 }} />
+
+      <Typography variant="h6" sx={{ px: 0, mt: 0, my: 1 }}>
+          Category
+      </Typography>
+
+      <Typography variant="body2" sx={{ px: 0, mt: 0, my: 2, color: ', 0, 0, 0.6)' }}>
+          Pick a category that best matches your goal
+      </Typography>
+
+      <FormControl fullWidth>
+        <InputLabel>Category</InputLabel>
+        <Select
+          value={selectedCategory}
+          onChange={handleSelectCategory}
+          label="Category"
+          sx={{ width: '40%' }}
+        >
+          {categoryList.map((category) => (
+            <MenuItem key={category} value={category}>
+              {category}
+            </MenuItem>
+          ))}
+        </Select>
+    </FormControl>
+
+
+
+
       <Divider sx={{ my: 3 }} />
 
       <Stack direction="column" spacing={2} sx={{ my: 0 }}>
         <Typography variant="h6" sx={{ px: 0, mt: 0 }}>
           Buddy Up
         </Typography>
+
+        <Typography variant="body2" sx={{ px: 0, mt: 0, color: 'rgba(0, 0, 0, 0.6)' }} >
+          Select your journey companiant
+        </Typography> 
+
         {isFriendEditing ? (
           <FormControl fullWidth>
             <InputLabel>Select a friend</InputLabel>
@@ -197,7 +222,14 @@ export default function GoalDetails({ title, selectedUser, friendDetails }) {
       </Stack>
       
       <Divider sx={{ my: 3 }} />
+      
+      <Typography variant="h6" sx={{ px: 0, mt: 0, my: 1 }}>
+          Due Date
+      </Typography>
 
+      <Typography variant="body2" sx={{ px: 0, mt: 0, color: 'rgba(0, 0, 0, 0.6)'}}>
+          Set a time to achieve your goal
+      </Typography>
       <Stack direction="column" spacing={0} sx={{ mb: 3 }} size="small">
         <Stack direction="row" spacing={3} sx={{ my: 1 }} size="small">
           <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -219,23 +251,18 @@ export default function GoalDetails({ title, selectedUser, friendDetails }) {
               />
             </LocalizationProvider>
           )}
-
-          <FormControl fullWidth>
-            <InputLabel>Category</InputLabel>
-            <Select
-              value={selectedCategory}
-              onChange={handleSelectCategory}
-              label="Category"
-              sx={{ width: '40%' }}
-            >
-              {categoryList.map((category) => (
-                <MenuItem key={category} value={category}>
-                  {category}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
         </Stack>
+        
+        <Divider sx={{ my: 3 }} />
+      
+        <Typography variant="h6" sx={{ px: 0, mt: 0, my: 1 }}>
+            Penalty
+        </Typography>
+
+        <Typography variant="body2" sx={{ px: 0, mt: 0, color: 'rgba(0, 0, 0, 0.6)' }} >
+          Increase your chance of completing the goals by setting up a daily penalty for not checking in
+        </Typography> 
+          
 
         <Stack direction="row" spacing={3} sx={{ my: 1 }} size="small">
           <FormControlLabel
@@ -250,14 +277,30 @@ export default function GoalDetails({ title, selectedUser, friendDetails }) {
             label="Enable Penalty"
           />
           {isPenaltyEnabled && (
-          <TextField
-            name="Daily Penalty"
-            label="Daily penalty amount"
-            onChange={(event) => setDailyPenalty(event.target.value)}
-          />
+              <TextField
+                name="Daily Penalty"
+                label="Daily penalty amount"
+                onChange={(event) => setDailyPenalty(event.target.value)}
+              />
           )}
+
         </Stack>
-      </Stack>
+
+        <Stack direction="row" spacing={3} sx={{ my: 1 }} size="small">
+        {isPenaltyEnabled && (
+          <Stack direction="column" spacing={1}>
+            <Typography variant="body2" sx={{ px: 0, mt: 0, my: 1, color: 'rgba(0, 0, 0, 0.6)' }}>
+              What would you like to do with your penalty fund?
+            </Typography>
+            <TextField
+              name="Penalty fund purpose"
+              label="Enter purpose..."
+              onChange={(event) => setDailyPenalty(event.target.value)}
+            />
+          </Stack>
+        )}
+        </Stack>
+      </Stack>  
 
       <LoadingButton
         fullWidth

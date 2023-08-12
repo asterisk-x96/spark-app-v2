@@ -25,13 +25,7 @@ const navConfig = [
     title: 'friends',
     path: '/friends',
     icon: icon('ic_friends'),
-  },
-  {
-    title: 'chat',
-    path: '/chat',
-    icon: icon('ic_chat'),
-  },
-
+  }
 ];
 
 export default navConfig;

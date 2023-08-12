@@ -15,17 +15,11 @@ import {
   Input,
   Container
 } from '@mui/material';
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-
 import { LoadingButton } from '@mui/lab';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useUserContext } from '../../../UserContext';
+import { categoryList } from '../../../data/goals';
 
-const categoryList = [
-  'Category 1',
-  'Category 2',
-  'Category 3',
-];
 
 export default function EditGoal() {
   const navigate = useNavigate();

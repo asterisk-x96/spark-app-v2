@@ -1,41 +1,38 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-// -----------------------------------------------
+import LoginPage from '../pages/LoginPage';
 import UserProfile from '../pages/UserProfile';
 import DashboardLayout from '../layouts/dashboard';
-import BlogPage from '../pages/BlogPage';
 import FriendsPage from '../pages/FriendsPage';
-import LoginPage from '../pages/LoginPage';
 import UserFundPage from '../pages/UserFund';
 import Page404 from '../pages/Page404';
 import GoalPage from '../pages/GoalPage';
 import DashboardAppPage from '../pages/DashboardAppPage';
 import NewGoalPage from '../pages/NewGoalPage';
-import GoalCreated from '../sections/@dashboard/goals/GoalCreated'
+import GoalCreated from '../sections/@dashboard/goals/GoalCreated';
 import RegisterPage from '../pages/RegisterPage';
 import TestData from '../pages/TestData';
 import UpdateProfile from '../sections/profile/UpdateProfile';
-import ChatPage from '../pages/ChatPage';
-import EditGoal from '../sections/@dashboard/goals/EditGoal'
+import EditGoal from '../sections/@dashboard/goals/EditGoal';
+import PrivateRoute from './PrivateRoute';
+import ResetPasswordPage from '../sections/auth/ResetPassword';
 
 export default function Router() {
   return (
     <Routes>
       <Route path="/" element={<DashboardLayout />}>
-        <Route index element={<DashboardAppPage />} />
-        <Route path="dashboard" element={<DashboardAppPage />} />
-        <Route path="friends" element={<FriendsPage />} />
-        <Route path="goals" element={<GoalPage />} />
-        <Route path="my-fund" element={ <UserFundPage /> } />
-        <Route path="blog" element={<BlogPage />} />
-        <Route path="create" element={<NewGoalPage />} />
-        <Route path="chat" element={<ChatPage />} />
-        <Route path="profile" element={<UpdateProfile />} />
-        <Route path="user/:username" element={<UserProfile />} />
-        <Route path="goal/:goalId" element={<GoalCreated />} />
-        <Route path="edit/:goalId" element={<EditGoal />} />
+        <Route index element={<PrivateRoute component={DashboardAppPage} />} />
+        <Route path="dashboard" element={<PrivateRoute component={DashboardAppPage} />} />
+        <Route path="friends" element={<PrivateRoute component={FriendsPage} />} />
+        <Route path="goals" element={<PrivateRoute component={GoalPage} />} />
+        <Route path="my-fund" element={<PrivateRoute component={UserFundPage} />} />
+        <Route path="create" element={<PrivateRoute component={NewGoalPage} />} />
+        <Route path="profile" element={<PrivateRoute component={UpdateProfile} />} />
+        <Route path="reset-password" element={<PrivateRoute component={ResetPasswordPage} />} />
+        <Route path="user/:username" element={<PrivateRoute component={UserProfile} />} />
+        <Route path="goal/:goalId" element={<PrivateRoute component={GoalCreated} />} />
+        <Route path="edit/:goalId" element={<PrivateRoute component={EditGoal} />} />
       </Route>
-      
       <Route path="login" element={<LoginPage />} />
       <Route path="register" element={<RegisterPage />} />
       <Route path="test" element={<TestData />} />

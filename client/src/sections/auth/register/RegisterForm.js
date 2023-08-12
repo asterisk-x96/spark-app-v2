@@ -27,7 +27,7 @@ export default function RegisterForm({ onShowRegisterDetails }) {
         }
       } catch (error) {
         console.error('Error checking email:', error);
-        setError('An error occurred while checking email. Please try again later.');
+        setError('Please enter an email address');
       }
     };
 

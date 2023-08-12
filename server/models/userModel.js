@@ -20,6 +20,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  bio: String,
   avatar: String,
   friends: [String],  
   fund: Number
@@ -33,8 +34,7 @@ userSchema.pre('save', async function (next) {
     }
 
     // Generate a salt and hash the password using bcrypt
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(this.password, saltRounds);
+    const hashedPassword = await bcrypt.hash(this.password, 10);
 
     // Replace the plaintext password with the hashed password
     this.password = hashedPassword;

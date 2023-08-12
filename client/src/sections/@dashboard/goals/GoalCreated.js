@@ -161,7 +161,7 @@ export default function GoalDetails() {
             <strong>Penalty Fund:</strong> {goal.penalty_fund}
           </Typography>
           <Typography variant="body2" sx={{ fontSize: '1rem' }}>
-            <strong>Complete Status:</strong> {goal.complete_status ? 'Complete' : 'Incomplete'}
+            <strong>Complete Status:</strong> {goal.isCompleted ? 'Complete' : 'Incomplete'}
           </Typography>
         </Paper>
       ) : (
